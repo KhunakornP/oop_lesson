@@ -15,6 +15,7 @@ with open(os.path.join(__location__, 'Countries.csv')) as f:
     for r in rows:
         countries.append(dict(r))
 
+
 class DB:
     def __init__(self):
         self.database = []
@@ -28,7 +29,10 @@ class DB:
                 return data_table
         return None
 
+
 import copy
+
+
 class Table:
     def __init__(self, name, table):
         self.name = name
@@ -46,34 +50,49 @@ class Table:
         return new_table
 
     def filter(self, condition):
-        filtered_list = []
+        filtered_table = Table(self.name + '_filtered', [])
         for item in self.table:
             if condition(item):
-                filtered_list.append(item)
-        return filtered_list
+                filtered_table.table.append(item)
+        return filtered_table
+
+    def aggregate(self, function, key):
+        temp = []
+        for item in self.table:
+            temp.append(float(item[key]))
+        return function(temp)
+
+    def select(self, attributes):
+        temp = []
+        for item in self.table:
+            temp_dict = {}
+            for key in item:
+                if key in attributes:
+                    temp_dict[key] = item[key]
+                temp.append(temp_dict)
+        return temp
+
+    def __str__(self):
+        return self.name + ':' + str(self.table)
 
 
-
-# Print the average temperature for all the cities in Italy
-temps = []
-my_country = 'Italy'
-for city in cities:
-    if city['country'] == my_country:
-        temps.append(float(city['temperature']))
-print(sum(temps)/len(temps))  
-
-print()
-# Print all cities that are not in the EU and whose average temperatures are below 5.0
-# Requires joining cities and countries
-import copy
-cities_ext = []
-for city in cities:
-    for country in countries:
-        if city['country'] == country['country']:
-            dict1 = copy.deepcopy(city)
-            dict2 = copy.deepcopy(country)
-            dict1.update(dict2)
-            cities_ext.append(dict1)
-for city in cities_ext:
-    if city['EU'] == 'no' and float(city['temperature']) < 5.0:
-        print(city)
+# test case for temp
+table1 = Table('cities', cities)
+table2 = Table('countries', countries)
+database = DB()
+database.insert(table1)
+database.insert(table2)
+table3 = table1.join(table2, "country")
+database.insert(table3)
+selected_table = database.search("cities.join")
+x = selected_table.filter(lambda c: c["EU"] == "yes").filter(lambda b: b["coastline"] == "no")
+print(f"Min temperature for cities in EU that do not have coastlines.\n"
+      f"{x.aggregate(lambda a: min(a), 'temperature')}")
+print(f"Max temperature for cities in EU that do not have coastlines.\n"
+      f"{x.aggregate(lambda a: max(a), 'temperature')}")
+# test case for latitude
+# selected_table is the same as the one in the previous test case.
+print(f"Min latitude for cities in all countries.\n"
+      f"{selected_table.aggregate(lambda a: min(a), 'latitude')}")
+print(f"Max latitude for cities in all countries.\n"
+      f"{selected_table.aggregate(lambda a: max(a), 'latitude')}")
