@@ -96,9 +96,9 @@ class AccountDataBase:
         """
         Deletes specified account. If no account is detected raise ValueError.
         """
-        if self.__search(acc_num) != -1:
+        if self.__search(acc_num) == -1:
             raise ValueError("invalid account number; nothing to be deleted.")
-        self.account_database.pop(acc_num)
+        self.account_database.pop(self.__search(acc_num))
 
     def __str__(self):
         string = ""
@@ -120,5 +120,5 @@ data.insert(c)
 data.insert(d)
 data.insert(e)
 print(data)
-data.delete(0)
+data.delete("0000")
 print(data)
