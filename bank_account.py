@@ -35,7 +35,7 @@ class Account:
         If the withdrawn amount exceeds the balance notify the user.
         """
         if not isinstance(value, (int, float)):
-            raise TypeError("Deposit amount must be a number")
+            raise TypeError("Withdrawn amount must be a number")
         if value < 0:
             raise ValueError("Can't withdraw a negative amount")
         if value > self.bal:

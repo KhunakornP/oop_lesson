@@ -87,25 +87,10 @@ database.insert(table3)
 selected_table = database.search("cities.join")
 x = selected_table.filter(lambda c: c["EU"] == "yes").filter(lambda b: b["coastline"] == "no")
 country_list = []
-for i in x.table:
-    if i["country"] not in country_list:
-        country_list.append(i["country"])
-print(f"Min temperature for cities in EU that do not have coastlines.")
-for j in country_list:
-    temp_list = x.filter(lambda c: c["country"] == j)
-    if len(temp_list.table) == 0:
-        continue
-    print(j)
-    print(temp_list.aggregate(lambda a: min(a), 'temperature'))
-print()
-print(f"Max temperature for cities in EU that do not have coastlines.")
-for j in country_list:
-    temp_list = x.filter(lambda c: c["country"] == j)
-    if len(temp_list.table) == 0:
-        continue
-    print(j)
-    print(temp_list.aggregate(lambda a: max(a), 'temperature'))
-print()
+print(f"Min temperature for cities in EU that do not have coastlines.\n"
+      f"{x.aggregate(lambda a: min(a), 'temperature')}")
+print(f"Max temperature for cities in EU that do not have coastlines.\n"
+      f"{x.aggregate(lambda a: max(a), 'temperature')}")
 # test case for latitude
 # selected_table is the same as the one in the previous test case.
 for i in selected_table.table:
